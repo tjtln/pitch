@@ -6,7 +6,6 @@
   "repository": "https://github.com/awslabs/aws-sam-cli/tree/develop/samcli/local/init/templates/cookiecutter-aws-sam-hello-nodejs",
   "author": "SAM CLI",
   "license": "MIT",
-  "type": "module",
   "scripts": {
     "unit": "jest",
     "lint": "eslint '*.ts' --quiet --fix",
