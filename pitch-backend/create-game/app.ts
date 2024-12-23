@@ -1,14 +1,11 @@
-import { APIGatewayProxyEvent } from "aws-lambda";
-
-const AWS = require('aws-sdk');
-
+import * as AWS from 'aws-sdk';
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
-export const handler = async (event: APIGatewayProxyEvent) => {
-  const { gameId, players, settings } = JSON.parse(event.body ?? "");
+export const handler = async (event: any) => {
+  const { gameId, players, settings } = JSON.parse(event.body);
 
   const params = {
-    TableName: process.env.GAME_TABLE ?? "undefined",
+    TableName: process.env.GAME_TABLE!,
     Item: {
       gameId,
       players,

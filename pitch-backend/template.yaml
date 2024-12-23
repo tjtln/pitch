@@ -6,7 +6,7 @@ Resources:
   CreateGameFunction:
       Type: AWS::Serverless::Function
       Properties:
-        Handler: app.handler
+        Handler: create-game/app.handler
         Runtime: nodejs22.x
         MemorySize: 128
         Timeout: 10
