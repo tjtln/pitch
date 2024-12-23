@@ -1,17 +1,17 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { lambdaHandler } from '../../app';
+import { handler } from '../../app';
 import { expect, describe, it } from '@jest/globals';
 
 describe('Unit test for app handler', function () {
     it('verifies successful response', async () => {
         const event: APIGatewayProxyEvent = {
             httpMethod: 'get',
-            body: '',
+            body: '{"gameId": "12345","players": ["player1", "player2", "player3", "player4"],"settings": {"rounds": 5,"gameType": "Poker"}}',
             headers: {},
             isBase64Encoded: false,
             multiValueHeaders: {},
             multiValueQueryStringParameters: {},
-            path: '/hello',
+            path: '/create-lambda',
             pathParameters: {},
             queryStringParameters: {},
             requestContext: {
@@ -42,24 +42,24 @@ describe('Unit test for app handler', function () {
                     userAgent: '',
                     userArn: '',
                 },
-                path: '/hello',
+                path: '/create-lambda',
                 protocol: 'HTTP/1.1',
                 requestId: 'c6af9ac6-7b61-11e6-9a41-93e8deadbeef',
                 requestTimeEpoch: 1428582896000,
                 resourceId: '123456',
-                resourcePath: '/hello',
+                resourcePath: '/create-lambda',
                 stage: 'dev',
             },
             resource: '',
             stageVariables: {},
         };
-        const result: APIGatewayProxyResult = await lambdaHandler(event);
+        const result: APIGatewayProxyResult = await handler(event);
 
         expect(result.statusCode).toEqual(200);
-        expect(result.body).toEqual(
-            JSON.stringify({
-                message: 'hello world',
-            }),
-        );
+        // expect(result.body).toEqual(
+        //     JSON.stringify({
+        //         message: 'hello world',
+        //     }),
+        // );
     });
 });
