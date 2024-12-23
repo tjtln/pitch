@@ -1,0 +1,43 @@
+name: SAM Build and Deploy
+
+permissions:
+  id-token: write
+  contents: read
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: {}
+env:
+  region: us-east-1
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install dependencies
+      working-directory: pitch-backend
+      run: npm install
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Build SAM application
+      working-directory: pitch-backend
+      run: sam build
+
+    - name: Deploy SAM application
+      working-directory: pitch-backend
+      run: sam deploy --no-confirm-changeset --config-file ./samconfig.toml
