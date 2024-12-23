@@ -30,13 +30,9 @@ Resources:
       AttributeDefinitions:
         - AttributeName: gameId
           AttributeType: S
-        - AttributeName: entityType
-          AttributeType: S
       KeySchema:
         - AttributeName: gameId
           KeyType: HASH # Partition key
-        - AttributeName: entityType
-          KeyType: RANGE # Sort key
       SSESpecification:
         SSEEnabled: true
       TimeToLiveSpecification:
