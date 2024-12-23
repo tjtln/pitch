@@ -22,10 +22,10 @@ Resources:
             Properties:
               Path: /create-game
               Method: post
-  CardGameTable:
+  GameTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: CardGameTable
+      TableName: GameTable
       BillingMode: PAY_PER_REQUEST # Adjust if you want provisioned capacity
       AttributeDefinitions:
         - AttributeName: gameId
@@ -49,7 +49,7 @@ Resources:
 Outputs:
   TableName:
     Description: DynamoDB table name
-    Value: !Ref CardGameTable
+    Value: !Ref GameTable
   TableArn:
     Description: DynamoDB table ARN
-    Value: !GetAtt CardGameTable.Arn
+    Value: !GetAtt GameTable.Arn
