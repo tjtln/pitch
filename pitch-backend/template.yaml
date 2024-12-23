@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SAM Template for a DynamoDB Table
+
+Resources:
+  CardGameTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: CardGameTable
+      BillingMode: PAY_PER_REQUEST # Adjust if you want provisioned capacity
+      AttributeDefinitions:
+        - AttributeName: gameId
+          AttributeType: S
+        - AttributeName: entityType
+          AttributeType: S
+      KeySchema:
+        - AttributeName: gameId
+          KeyType: HASH # Partition key
+        - AttributeName: entityType
+          KeyType: RANGE # Sort key
+      SSESpecification:
+        SSEEnabled: true
+      TimeToLiveSpecification:
+        AttributeName: ttl # Optional for automatic record expiration
+        Enabled: true
+      Tags:
+        - Key: Project
+          Value: CardGameApp
+
+Outputs:
+  TableName:
+    Description: DynamoDB table name
+    Value: !Ref CardGameTable
+  TableArn:
+    Description: DynamoDB table ARN
+    Value: !GetAtt CardGameTable.Arn
