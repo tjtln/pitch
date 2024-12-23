@@ -15,7 +15,7 @@ export const handler = async (event: any) => {
   };
 
   try {
-    //await dynamoDB.put(params).promise();
+    await dynamoDB.put(params).promise();
     return {
       statusCode: 200,
       body: JSON.stringify({ message: 'Game created successfully!', gameId }),
