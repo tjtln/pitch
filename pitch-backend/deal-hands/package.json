@@ -1,0 +1,19 @@
+{
+  "name": "create-game",
+  "version": "1.0.0",
+  "main": "app.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "npx tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/node": "^22.10.2"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1692.0",
+    "typescript": "^5.7.2"
+  }
+}
