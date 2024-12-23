@@ -3,6 +3,25 @@ Transform: AWS::Serverless-2016-10-31
 Description: SAM Template for a DynamoDB Table
 
 Resources:
+  CreateGameFunction:
+      Type: AWS::Serverless::Function
+      Properties:
+        Handler: app.handler
+        Runtime: nodejs22.x
+        MemorySize: 128
+        Timeout: 10
+        Environment:
+          Variables:
+            GAME_TABLE: !Ref GameTable
+        Policies:
+          - DynamoDBCrudPolicy:
+              TableName: !Ref GameTable
+        Events:
+          CreateGameApi:
+            Type: Api
+            Properties:
+              Path: /create-game
+              Method: post
   CardGameTable:
     Type: AWS::DynamoDB::Table
     Properties:
