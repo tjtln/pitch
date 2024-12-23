@@ -23,9 +23,9 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Install dependencies
-      working-directory: pitch-backend
-      run: npm install
+    # - name: Install dependencies
+    #   working-directory: pitch-backend
+    #   run: npm install
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
