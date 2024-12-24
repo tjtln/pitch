@@ -1,5 +1,5 @@
 {
-  "body": "{\"gameId\": \"game1234\",\"players\": [{ \"playerId\": \"player1\", \"name\": \"Alice\" },{ \"playerId\": \"player2\", \"name\": \"Bob\" }],\"settings\": {\"rounds\": 5,\"maxPoints\": 100}}",
+  "body": "{\"players\":[\"player1\",\"player2\",\"player3\",\"player4\"]}",
   "resource": "/{proxy+}",
   "path": "/path/to/resource",
   "httpMethod": "POST",

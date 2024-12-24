@@ -3,27 +3,36 @@ import { DynamoDB } from 'aws-sdk';
 const dynamoDB = new DynamoDB.DocumentClient();
 
 export const handler = async (event: any) => {
-  const { player } = event.pathParameters.player;
+  const { gameId, player } = event.pathParameters; // Extract gameId and player from path parameters
 
   const params = {
-    TableName: process.env.HANDS_TABLE!,
+    TableName: process.env.GAME_TABLE!, // Use the GAME_TABLE for fetching the hand
     Key: {
-      player,
+      gameId, // Primary key: gameId
     },
   };
 
   try {
     const data = await dynamoDB.get(params).promise();
+    
     if (!data.Item) {
       return {
         statusCode: 404,
-        body: JSON.stringify({ message: 'Hand not found' }),
+        body: JSON.stringify({ message: 'Game not found' }),
+      };
+    }
+
+    const hands = data.Item.hands;
+    if (!hands || !hands[player]) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ message: 'Player hand not found' }),
       };
     }
 
     return {
       statusCode: 200,
-      body: JSON.stringify(data.Item),
+      body: JSON.stringify({ player, hand: hands[player] }),
     };
   } catch (error) {
     console.error('Error fetching item:', error);

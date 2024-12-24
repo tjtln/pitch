@@ -23,6 +23,7 @@ Resources:
           Properties:
             Path: /create-game
             Method: post
+
   DealHandsFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -33,36 +34,38 @@ Resources:
       CodeUri: deal-hands/
       Environment:
         Variables:
-          HANDS_TABLE: !Ref GameTable
+          GAME_TABLE: !Ref GameTable
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: !Ref HandsTable
+            TableName: !Ref GameTable
       Events:
-        CreateGameApi:
+        DealHandsApi:
           Type: Api
           Properties:
-            Path: /deal-hands
+            Path: /games/{gameId}/deal-hands  # Accepts gameId as a path parameter
             Method: post
+
   GetHandFunction:
-      Type: AWS::Serverless::Function
-      Properties:
-        Handler: dist/app.handler
-        Runtime: nodejs22.x
-        MemorySize: 128
-        Timeout: 10
-        CodeUri: get-hand/
-        Environment:
-          Variables:
-            HANDS_TABLE: !Ref HandsTable
-        Policies:
-          - DynamoDBCrudPolicy:
-              TableName: !Ref HandsTable
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/app.handler
+      Runtime: nodejs22.x
+      MemorySize: 128
+      Timeout: 10
+      CodeUri: get-hand/
+      Environment:
+        Variables:
+          GAME_TABLE: !Ref GameTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref GameTable
       Events:
-        CreateGameApi:
+        GetHandApi:
           Type: Api
           Properties:
-            Path: /deal-hands
-            Method: post
+            Path: /games/{gameId}/players/{player}/hand  # Accepts gameId and player as path parameters
+            Method: get
+
   GameTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -82,30 +85,3 @@ Resources:
       Tags:
         - Key: Project
           Value: CardGameApp
-  HandsTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: Handstable
-      BillingMode: PAY_PER_REQUEST # Adjust if you want provisioned capacity
-      AttributeDefinitions:
-        - AttributeName: player
-          AttributeType: S
-      KeySchema:
-        - AttributeName: player
-          KeyType: HASH # Partition key
-      SSESpecification:
-        SSEEnabled: true
-      TimeToLiveSpecification:
-        AttributeName: ttl # Optional for automatic record expiration
-        Enabled: true
-      Tags:
-        - Key: Project
-          Value: CardGameApp
-
-Outputs:
-  TableName:
-    Description: DynamoDB table name
-    Value: !Ref GameTable
-  TableArn:
-    Description: DynamoDB table ARN
-    Value: !GetAtt GameTable.Arn

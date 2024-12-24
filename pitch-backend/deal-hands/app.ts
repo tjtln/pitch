@@ -2,30 +2,36 @@ import * as AWS from 'aws-sdk';
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 export const handler = async (event: any) => {
-  const body: {players: playersInput} = JSON.parse(event.body);
+  const gameId = event.pathParameters?.gameId; // Extract gameId from path parameters
+  if (!gameId) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: "Missing gameId in path parameters" }),
+    };
+  }
+
+  const body: { players: playersInput } = JSON.parse(event.body);
   const players = body.players;
-  const hands: {[player: string]: any[]} = getHands(players);
-  const putRequests = Object.entries(hands).map(([player, hand]) => ({
-    PutRequest: {
-      Item: {
-        player,
-        hand,
-        createdAt: new Date().toISOString(),
-      },
-    },
-  }));
+  const hands: { [player: string]: any[] } = getHands(players);
 
   const params = {
-    RequestItems: {
-      [process.env.HANDS_TABLE ?? "undefined table"]: putRequests,
+    TableName: process.env.GAME_TABLE!,
+    Key: { gameId },
+    UpdateExpression: "SET hands = :hands",
+    ExpressionAttributeValues: {
+      ":hands": hands,
     },
+    ReturnValues: "ALL_NEW",
   };
 
   try {
-    await dynamoDB.batchWrite(params).promise();
+    const result = await dynamoDB.update(params).promise();
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: "Hands dealt successfully!" }),
+      body: JSON.stringify({
+        message: "Hands dealt successfully!",
+        updatedGame: result.Attributes,
+      }),
     };
   } catch (error) {
     console.error("Error dealing hands:", error);
@@ -66,7 +72,7 @@ function populateDeck(): string[] {
           rank = "K";
           break;
         default:
-          rank = "UhhThisIsntACard";
+          rank = "InvalidCard";
       }
 
       switch (j) {
@@ -85,24 +91,24 @@ function populateDeck(): string[] {
       }
     }
   }
-  deck.push('JH');
-  deck.push('JL');
+  deck.push('JkH');
+  deck.push('JkL');
 
   return deck;
 }
 
 function shuffleArray(array: string[]): string[] {
   for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
   }
 
   return array;
 }
 
-function getHands(players: playersInput): { [player: string]: any[]; } {
+function getHands(players: playersInput): { [player: string]: any[] } {
   let deck: string[] = populateDeck();
-  const hands: { [player: string]: any[]; } = {};
+  const hands: { [player: string]: any[] } = {};
   deck = shuffleArray(deck);
   hands[players[1]] = deck.splice(0, 13);
   hands[players[2]] = deck.splice(0, 14);
@@ -112,8 +118,8 @@ function getHands(players: playersInput): { [player: string]: any[]; } {
 }
 
 type playersInput = {
-  1: string,
-  2: string,
-  3: string,
-  4: string
-}
+  1: string;
+  2: string;
+  3: string;
+  4: string;
+};
