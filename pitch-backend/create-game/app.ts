@@ -14,6 +14,7 @@ type GameData = {
   gameId: string;
   roundsPlayed: number;
   players: Player[];
+  createdDate: string; // Added createdDate
 };
 
 export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
@@ -46,9 +47,9 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
       gameId,
       roundsPlayed: 0,
       players,
+      createdDate: new Date().toISOString(),
     };
 
-    // Insert the game object into DynamoDB
     const params = {
       TableName: GAME_TABLE,
       Item: gameData,
@@ -72,7 +73,6 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
   }
 };
 
-// Helper function to generate a unique game ID
 function generateGameId(): string {
-  return Math.random().toString(36).slice(2, 11); // Generate a 9-character ID
+  return Math.random().toString(36).slice(2, 11);
 }
