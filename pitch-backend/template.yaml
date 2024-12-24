@@ -6,10 +6,11 @@ Resources:
   CreateGameFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: create-game/app.handler
+      Handler: dist/app.handler
       Runtime: nodejs22.x
       MemorySize: 128
       Timeout: 10
+      CodeUri: create-game/
       Environment:
         Variables:
           GAME_TABLE: !Ref GameTable
@@ -22,14 +23,14 @@ Resources:
           Properties:
             Path: /create-game
             Method: post
-
   DealHandsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: deal-hands/app.handler
+      Handler: dist/app.handler
       Runtime: nodejs22.x
       MemorySize: 128
       Timeout: 10
+      CodeUri: deal-hands/
       Environment:
         Variables:
           HANDS_TABLE: !Ref GameTable
@@ -42,7 +43,26 @@ Resources:
           Properties:
             Path: /deal-hands
             Method: post
-
+  GetHandFunction:
+      Type: AWS::Serverless::Function
+      Properties:
+        Handler: dist/app.handler
+        Runtime: nodejs22.x
+        MemorySize: 128
+        Timeout: 10
+        CodeUri: get-hand/
+        Environment:
+          Variables:
+            HANDS_TABLE: !Ref HandsTable
+        Policies:
+          - DynamoDBCrudPolicy:
+              TableName: !Ref HandsTable
+      Events:
+        CreateGameApi:
+          Type: Api
+          Properties:
+            Path: /deal-hands
+            Method: post
   GameTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -62,7 +82,6 @@ Resources:
       Tags:
         - Key: Project
           Value: CardGameApp
-
   HandsTable:
     Type: AWS::DynamoDB::Table
     Properties:
