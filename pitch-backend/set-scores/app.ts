@@ -18,34 +18,39 @@ type GameData = {
 
 export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
   try {
-    const { gameId, player } = event.pathParameters!;
-    const { score } = JSON.parse(event.body!); // The new score for the player
+    const { gameId } = event.pathParameters!;
+    const scores: { [player: string]: number } = JSON.parse(event.body!); // Scores for multiple players
 
-    if (score === undefined || typeof score !== "number") {
+    // Validate the scores object
+    if (Object.values(scores).some(score => typeof score !== 'number')) {
       return {
         statusCode: 400,
         body: JSON.stringify({ error: "Invalid score value" }),
       };
     }
 
-    if (!player) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "Player name is required" }),
-      };
-    }
+    // Build the update expression dynamically for all players
+    const updateExpression = Object.keys(scores)
+      .map(player => `SET scores.#${player} = :${player}`)
+      .join(', ');
 
-    // Update the player's score
+    // Define a specific type for ExpressionAttributeNames and ExpressionAttributeValues
+    const expressionAttributeNames: { [key: string]: string } = {};
+    const expressionAttributeValues: { [key: string]: any } = {};
+
+    // Populate expressionAttributeNames and expressionAttributeValues
+    Object.keys(scores).forEach(player => {
+      expressionAttributeNames[`#${player}`] = player;
+      expressionAttributeValues[`:${player}`] = scores[player];
+    });
+
+    // Update the scores for the players
     const params = {
       TableName: GAME_TABLE,
       Key: { gameId },
-      UpdateExpression: "SET scores.#player = :score",
-      ExpressionAttributeNames: {
-        "#player": player, // player is dynamic, so we need to use a placeholder
-      },
-      ExpressionAttributeValues: {
-        ":score": score,
-      },
+      UpdateExpression: updateExpression,
+      ExpressionAttributeNames: expressionAttributeNames,
+      ExpressionAttributeValues: expressionAttributeValues,
       ReturnValues: "ALL_NEW",
     };
 
@@ -67,10 +72,10 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
       },
     };
   } catch (error) {
-    console.error("Error updating score:", error);
+    console.error("Error updating scores:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Failed to set score" }),
+      body: JSON.stringify({ error: "Failed to set scores" }),
       headers: {
         "Access-Control-Allow-Origin": "*", // Allow all origins
       },
