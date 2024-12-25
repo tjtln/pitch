@@ -4,6 +4,17 @@ build:
 deploy:
 	sam deploy
 
+install-create-game:
+	cd create-game && npm i
+
+install-deal-hands:
+	cd deal-hands && npm i
+
+install-get-hand:
+	cd get-hand && npm i
+
+install-all: install-create-game install-deal-hands install-get-hand
+
 compile-create-game:
 	cd create-game && npm run compile
 
