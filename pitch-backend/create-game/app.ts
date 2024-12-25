@@ -7,8 +7,8 @@ const GAME_TABLE = process.env.GAME_TABLE!;
 type GameData = {
   gameId: string;
   roundsPlayed: number;
-  hands: {[player: string]: string[]};
-  scores: {[player: string]: number};
+  hands: { [player: string]: string[] };
+  scores: { [player: string]: number }[]; // Updated to array of objects
   players: string[];
   createdDate: string;
 };
@@ -22,7 +22,7 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
         body: JSON.stringify({ error: "Missing request body" }),
       };
     }
-    
+
     const body: { players: string[] } = JSON.parse(event.body);
 
     if (!body.players || !Array.isArray(body.players) || body.players.length < 2) {
@@ -34,19 +34,17 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
 
     // Generate gameId and prepare game data
     const gameId = generateGameId();
-    const scores: { [player: string]: number } = {}; // Explicit type declaration
     const players: string[] = body.players;
 
-    for (const player of players) {
-      scores[player] = 0;
-    }
+    // Create an array of objects for scores
+    const scores = players.map((player) => ({ [player]: 0 })); // [{ 'TJ': 0 }, { 'Kenzie': 0 }, ...]
 
     const gameData: GameData = {
       gameId,
       roundsPlayed: 0,
       players,
       hands: {},
-      scores: {},
+      scores,
       createdDate: new Date().toISOString(),
     };
 
