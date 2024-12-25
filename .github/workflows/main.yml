@@ -24,12 +24,12 @@ jobs:
         node-version: '20'
 
     - name: Install dependencies
-      working-directory: pitch-backend/create-game
-      run: npm install
+      working-directory: pitch-backend
+      run: make install-all
 
     - name: Compile
-      working-directory: pitch-backend/create-game
-      run: npm run compile
+      working-directory: pitch-backend
+      run: make compile-all
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
