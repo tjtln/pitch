@@ -19,6 +19,9 @@ export const handler = async (event: any) => {
       return {
         statusCode: 404,
         body: JSON.stringify({ message: 'Game not found' }),
+        headers: {
+          "Access-Control-Allow-Origin": "*", // Allow all origins
+        },
       };
     }
 
@@ -27,18 +30,27 @@ export const handler = async (event: any) => {
       return {
         statusCode: 404,
         body: JSON.stringify({ message: 'Player hand not found' }),
+        headers: {
+          "Access-Control-Allow-Origin": "*", // Allow all origins
+        },
       };
     }
 
     return {
       statusCode: 200,
       body: JSON.stringify({ player, hand: hands[player] }),
+      headers: {
+        "Access-Control-Allow-Origin": "*", // Allow all origins
+      },
     };
   } catch (error) {
     console.error('Error fetching item:', error);
     return {
       statusCode: 500,
       body: JSON.stringify({ message: 'Failed to retrieve hand' }),
+      headers: {
+        "Access-Control-Allow-Origin": "*", // Allow all origins
+      },
     };
   }
 };

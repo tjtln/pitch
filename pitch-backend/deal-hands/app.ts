@@ -7,6 +7,9 @@ export const handler = async (event: any) => {
     return {
       statusCode: 400,
       body: JSON.stringify({ message: "Missing gameId in path parameters" }),
+      headers: {
+        "Access-Control-Allow-Origin": "*", // Allow all origins
+      },
     };
   }
 
@@ -32,12 +35,18 @@ export const handler = async (event: any) => {
         message: "Hands dealt successfully!",
         updatedGame: result.Attributes,
       }),
+      headers: {
+        "Access-Control-Allow-Origin": "*", // Allow all origins
+      },
     };
   } catch (error) {
     console.error("Error dealing hands:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ message: "Failed to deal hands", error }),
+      headers: {
+        "Access-Control-Allow-Origin": "*", // Allow all origins
+      },
     };
   }
 };

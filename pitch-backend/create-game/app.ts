@@ -15,7 +15,6 @@ type GameData = {
 
 export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
   try {
-    // Parse the incoming request body
     if (!event.body) {
       return {
         statusCode: 400,
@@ -29,6 +28,9 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
       return {
         statusCode: 400,
         body: JSON.stringify({ error: "Invalid players list" }),
+        headers: {
+          "Access-Control-Allow-Origin": "*", // Allow all origins
+        },
       };
     }
 
@@ -61,12 +63,18 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
         message: "Game created successfully",
         gameId,
       }),
+      headers: {
+        "Access-Control-Allow-Origin": "*", // Allow all origins
+      },
     };
   } catch (error) {
     console.error("Error creating game:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Failed to create game" }),
+      headers: {
+        "Access-Control-Allow-Origin": "*", // Allow all origins
+      },
     };
   }
 };
