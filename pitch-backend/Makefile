@@ -19,10 +19,10 @@ compile-create-game:
 	cd create-game && npm run compile
 
 compile-deal-hands:
-	cd create-game && npm run compile
+	cd deal-hands && npm run compile
 
 compile-get-hand:
-	cd create-game && npm run compile
+	cd get-hand && npm run compile
 
 compile-all: compile-create-game compile-deal-hands compile-get-hand
 
