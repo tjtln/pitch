@@ -1,5 +1,5 @@
 {
-  "body": "",
+  "body": "[\"AH\", \"3D\", \"4H\", \"JkL\"]",
   "resource": "/{proxy+}",
   "path": "/path/to/resource",
   "httpMethod": "GET",

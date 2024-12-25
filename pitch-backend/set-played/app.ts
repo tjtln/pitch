@@ -1,5 +1,6 @@
 import { DynamoDB } from "aws-sdk";
 import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
+import { Console } from "console";
 
 const dynamoDb = new DynamoDB.DocumentClient();
 const GAME_TABLE = process.env.GAME_TABLE!;
@@ -19,53 +20,34 @@ type GameData = {
 export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
   try {
     const { gameId } = event.pathParameters!;
-    const { playedCards } = JSON.parse(event.body!);
+    const playedCards: any = JSON.parse(event.body!);
 
-    // Validate playedCards input
-    if (!Array.isArray(playedCards)) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "Invalid input. playedCards should be an array." }),
-      };
-    }
-
-    // Fetch the game data from DynamoDB
+    // Update the played cards for the game
     const params = {
       TableName: GAME_TABLE,
       Key: { gameId },
+      UpdateExpression: "SET played = :played",
+      ExpressionAttributeValues: {
+        ":played": playedCards,
+      },
+      ReturnValues: "ALL_NEW",
     };
 
-    const result = await dynamoDb.get(params).promise();
+    const result = await dynamoDb.update(params).promise();
 
-    if (!result.Item) {
+    if (!result.Attributes) {
       return {
         statusCode: 404,
         body: JSON.stringify({ error: "Game not found" }),
       };
     }
 
-    const gameData = result.Item as GameData;
-
-    // Update the played cards
-    gameData.played = [...gameData.played, ...playedCards];
-
-    const updateParams = {
-      TableName: GAME_TABLE,
-      Key: { gameId },
-      UpdateExpression: "set played = :played",
-      ExpressionAttributeValues: {
-        ":played": gameData.played,
-      },
-      ReturnValues: "ALL_NEW",
-    };
-
-    await dynamoDb.update(updateParams).promise();
-
+    const updatedGameData = result.Attributes as GameData;
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: "Played cards updated successfully" }),
+      body: JSON.stringify({ played: updatedGameData.played }),
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": "*", // Allow all origins
       },
     };
   } catch (error) {
@@ -74,7 +56,7 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
       statusCode: 500,
       body: JSON.stringify({ error: "Failed to set played cards" }),
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": "*", // Allow all origins
       },
     };
   }
