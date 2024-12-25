@@ -245,6 +245,92 @@ Resources:
             Path: /games/{gameId}/played
             Method: get
 
+  # Set Bid Function
+  SetBidFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/app.handler
+      Runtime: nodejs22.x
+      MemorySize: 128
+      Timeout: 10
+      CodeUri: set-bid/
+      Environment:
+        Variables:
+          GAME_TABLE: !Ref GameTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref GameTable
+      Events:
+        SetBidApi:
+          Type: Api
+          Properties:
+            Path: /games/{gameId}/bid
+            Method: post
+
+  # Set Phase Function
+  SetPhaseFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/app.handler
+      Runtime: nodejs22.x
+      MemorySize: 128
+      Timeout: 10
+      CodeUri: set-phase/
+      Environment:
+        Variables:
+          GAME_TABLE: !Ref GameTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref GameTable
+      Events:
+        SetBidApi:
+          Type: Api
+          Properties:
+            Path: /games/{gameId}/phase/{phase}
+            Method: post
+
+# Get Bid Function
+  GetBidFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/app.handler
+      Runtime: nodejs22.x
+      MemorySize: 128
+      Timeout: 10
+      CodeUri: get-bid/
+      Environment:
+        Variables:
+          GAME_TABLE: !Ref GameTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref GameTable
+      Events:
+        SetBidApi:
+          Type: Api
+          Properties:
+            Path: /games/{gameId}/bid
+            Method: get
+  # Get Phase Function
+  GetPhaseFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/app.handler
+      Runtime: nodejs22.x
+      MemorySize: 128
+      Timeout: 10
+      CodeUri: set-phase/
+      Environment:
+        Variables:
+          GAME_TABLE: !Ref GameTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref GameTable
+      Events:
+        SetBidApi:
+          Type: Api
+          Properties:
+            Path: /games/{gameId}/phase
+            Method: get
   # DynamoDB Table for Game Data
   GameTable:
     Type: AWS::DynamoDB::Table

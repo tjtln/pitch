@@ -37,7 +37,19 @@ install-set-played:
 install-get-played:
 	cd get-played && npm i
 
-install-all: install-create-game install-deal-hands install-get-hand install-get-dealer install-set-dealer install-set-scores install-get-scores install-set-turn install-get-turn install-set-played install-get-played
+install-get-phase:
+	cd get-phase && npm i
+
+install-set-phase:
+	cd set-phase && npm i
+
+install-get-bid:
+	cd get-bid && npm i
+
+install-set-bid:
+	cd set-bid && npm i
+
+install-all: install-create-game install-deal-hands install-get-hand install-get-dealer install-set-dealer install-set-scores install-get-scores install-set-turn install-get-turn install-set-played install-get-played install-get-phase install-set-phase install-get-bid install-set-bid
 
 compile-create-game:
 	cd create-game && npm run compile
@@ -72,7 +84,19 @@ compile-set-played:
 compile-get-played:
 	cd get-played && npm run compile
 
-compile-all: compile-create-game compile-deal-hands compile-get-hand compile-get-dealer compile-set-dealer compile-set-scores compile-get-scores compile-set-turn compile-get-turn compile-set-played compile-get-played
+compile-get-phase:
+	cd get-phase && npm run compile
+
+compile-set-phase:
+	cd set-phase && npm run compile
+
+compile-get-bid:
+	cd get-bid && npm run compile
+
+compile-set-bid:
+	cd set-bid && npm run compile
+
+compile-all: compile-create-game compile-deal-hands compile-get-hand compile-get-dealer compile-set-dealer compile-set-scores compile-get-scores compile-set-turn compile-get-turn compile-set-played compile-get-played compile-get-phase compile-set-phase compile-get-bid compile-set-bid
 
 invoke-create-game: compile-create-game build
 	sam local invoke CreateGameFunction --event events/createGame.json
@@ -106,3 +130,15 @@ invoke-set-played: compile-set-played build
 
 invoke-get-played: compile-get-played build
 	sam local invoke GetPlayedFunction --event events/getPlayed.json
+
+invoke-get-phase: compile-get-phase build
+	sam local invoke GetPhaseFunction --event events/getPhase.json
+
+invoke-set-phase: compile-set-phase build
+	sam local invoke SetPhaseFunction --event events/setPhase.json
+
+invoke-get-bid: compile-get-bid build
+	sam local invoke GetBidFunction --event events/getBid.json
+
+invoke-set-bid: compile-set-bid build
+	sam local invoke SetBidFunction --event events/setBid.json

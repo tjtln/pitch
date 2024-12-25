@@ -14,6 +14,8 @@ type GameData = {
   turn: string;
   played: string[];
   createdDate: string;
+  bid: { [player: string]: number }; // New bid column
+  phase: string; // New phase column
 };
 
 export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
@@ -61,6 +63,8 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
       turn,
       played: [], // Start with an empty array for played cards
       createdDate: new Date().toISOString(),
+      bid: {}, // Initialize bid as an empty object
+      phase: "waiting", // Initialize phase as "waiting"
     };
 
     const params = {
