@@ -47,7 +47,6 @@ const GameScreen: React.FC = () => {
           <h2>Your Hand</h2>
           <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
             {hand.map((card, index) => (
-              console.log('my card: ' + card) && 
               <img
                 key={index}
                 src={cardImageUrl(card)}

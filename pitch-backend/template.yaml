@@ -1,8 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: SAM Template for a DynamoDB Table
+Description: SAM Template for a Card Game Application
 
 Resources:
+  # Create Game Function
   CreateGameFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -24,6 +25,7 @@ Resources:
             Path: /create-game
             Method: post
 
+  # Deal Hands Function
   DealHandsFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -42,9 +44,10 @@ Resources:
         DealHandsApi:
           Type: Api
           Properties:
-            Path: /games/{gameId}/deal-hands  # Accepts gameId as a path parameter
+            Path: /games/{gameId}/deal-hands
             Method: post
 
+  # Get Hand Function
   GetHandFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -63,20 +66,197 @@ Resources:
         GetHandApi:
           Type: Api
           Properties:
-            Path: /games/{gameId}/players/{player}/hand  # Accepts gameId and player as path parameters
+            Path: /games/{gameId}/players/{player}/hand
             Method: get
 
+  # Get Dealer Function
+  GetDealerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/app.handler
+      Runtime: nodejs22.x
+      MemorySize: 128
+      Timeout: 10
+      CodeUri: get-dealer/
+      Environment:
+        Variables:
+          GAME_TABLE: !Ref GameTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref GameTable
+      Events:
+        GetDealerApi:
+          Type: Api
+          Properties:
+            Path: /games/{gameId}/dealer
+            Method: get
+
+  # Set Dealer Function
+  SetDealerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/app.handler
+      Runtime: nodejs22.x
+      MemorySize: 128
+      Timeout: 10
+      CodeUri: set-dealer/
+      Environment:
+        Variables:
+          GAME_TABLE: !Ref GameTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref GameTable
+      Events:
+        SetDealerApi:
+          Type: Api
+          Properties:
+            Path: /games/{gameId}/dealer/{player}
+            Method: post
+
+  # Set Scores Function
+  SetScoresFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/app.handler
+      Runtime: nodejs22.x
+      MemorySize: 128
+      Timeout: 10
+      CodeUri: set-scores/
+      Environment:
+        Variables:
+          GAME_TABLE: !Ref GameTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref GameTable
+      Events:
+        SetScoresApi:
+          Type: Api
+          Properties:
+            Path: /games/{gameId}/scores
+            Method: post
+
+  # Get Scores Function
+  GetScoresFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/app.handler
+      Runtime: nodejs22.x
+      MemorySize: 128
+      Timeout: 10
+      CodeUri: get-scores/
+      Environment:
+        Variables:
+          GAME_TABLE: !Ref GameTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref GameTable
+      Events:
+        GetScoresApi:
+          Type: Api
+          Properties:
+            Path: /games/{gameId}/scores
+            Method: get
+
+  # Get Turn Function
+  GetTurnFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/app.handler
+      Runtime: nodejs22.x
+      MemorySize: 128
+      Timeout: 10
+      CodeUri: get-turn/
+      Environment:
+        Variables:
+          GAME_TABLE: !Ref GameTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref GameTable
+      Events:
+        GetTurnApi:
+          Type: Api
+          Properties:
+            Path: /games/{gameId}/turn
+            Method: get
+
+  # Set Turn Function
+  SetTurnFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/app.handler
+      Runtime: nodejs22.x
+      MemorySize: 128
+      Timeout: 10
+      CodeUri: set-turn/
+      Environment:
+        Variables:
+          GAME_TABLE: !Ref GameTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref GameTable
+      Events:
+        SetTurnApi:
+          Type: Api
+          Properties:
+            Path: /games/{gameId}/turn/{player}
+            Method: post
+
+  # Set Played Function
+  SetPlayedFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/app.handler
+      Runtime: nodejs22.x
+      MemorySize: 128
+      Timeout: 10
+      CodeUri: set-played/
+      Environment:
+        Variables:
+          GAME_TABLE: !Ref GameTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref GameTable
+      Events:
+        SetPlayedApi:
+          Type: Api
+          Properties:
+            Path: /games/{gameId}/played
+            Method: post
+
+  # Get Played Function
+  GetPlayedFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/app.handler
+      Runtime: nodejs22.x
+      MemorySize: 128
+      Timeout: 10
+      CodeUri: get-played/
+      Environment:
+        Variables:
+          GAME_TABLE: !Ref GameTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref GameTable
+      Events:
+        GetPlayedApi:
+          Type: Api
+          Properties:
+            Path: /games/{gameId}/played
+            Method: get
+
+  # DynamoDB Table for Game Data
   GameTable:
     Type: AWS::DynamoDB::Table
     Properties:
       TableName: GameTable
-      BillingMode: PAY_PER_REQUEST # Adjust if you want provisioned capacity
+      BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: gameId
           AttributeType: S
       KeySchema:
         - AttributeName: gameId
-          KeyType: HASH # Partition key
+          KeyType: HASH
       SSESpecification:
         SSEEnabled: true
       TimeToLiveSpecification:

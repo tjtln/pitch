@@ -8,8 +8,11 @@ type GameData = {
   gameId: string;
   roundsPlayed: number;
   hands: { [player: string]: string[] };
-  scores: { [player: string]: number }[]; // Updated to array of objects
+  scores: { [player: string]: number }[];
   players: string[];
+  dealer: string;
+  turn: string;
+  played: string[];
   createdDate: string;
 };
 
@@ -39,14 +42,24 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
     const players: string[] = body.players;
 
     // Create an array of objects for scores
-    const scores = players.map((player) => ({ [player]: 0 })); // [{ 'TJ': 0 }, { 'Kenzie': 0 }, ...]
+    const scores = players.map((player) => ({ [player]: 0 }));
 
+    // Assign dealer as the first player in the list
+    const dealer = players[0];
+
+    // Assign turn to the player after the dealer (or wrap around to the first player if only two players)
+    const turn = players[1 % players.length];
+
+    // Initialize game data
     const gameData: GameData = {
       gameId,
       roundsPlayed: 0,
       players,
       hands: {},
       scores,
+      dealer,
+      turn,
+      played: [], // Start with an empty array for played cards
       createdDate: new Date().toISOString(),
     };
 
