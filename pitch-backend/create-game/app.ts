@@ -4,17 +4,13 @@ import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
 const dynamoDb = new DynamoDB.DocumentClient();
 const GAME_TABLE = process.env.GAME_TABLE!;
 
-type Player = {
-  name: string;
-  score: number;
-  hand: string[];
-};
-
 type GameData = {
   gameId: string;
   roundsPlayed: number;
-  players: Player[];
-  createdDate: string; // Added createdDate
+  hands: {[player: string]: string[]};
+  scores: {[player: string]: number};
+  players: string[];
+  createdDate: string;
 };
 
 export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
@@ -38,15 +34,19 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
 
     // Generate gameId and prepare game data
     const gameId = generateGameId();
-    const players: Player[] = body.players.map((name) => ({
-      name,
-      score: 0,
-      hand: [], // Initially empty hands
-    }));
+    const scores: { [player: string]: number } = {}; // Explicit type declaration
+    const players: string[] = body.players;
+
+    for (const player of players) {
+      scores[player] = 0;
+    }
+
     const gameData: GameData = {
       gameId,
       roundsPlayed: 0,
       players,
+      hands: {},
+      scores: {},
       createdDate: new Date().toISOString(),
     };
 
