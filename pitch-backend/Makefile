@@ -52,7 +52,10 @@ install-set-bid:
 install-get-players:
 	cd get-players && npm i
 
-install-all: install-create-game install-deal-hands install-get-hand install-get-dealer install-set-dealer install-set-scores install-get-scores install-set-turn install-get-turn install-set-played install-get-played install-get-phase install-set-phase install-get-bid install-set-bid install-get-players
+install-set-players:
+	cd set-players && npm i
+
+install-all: install-create-game install-deal-hands install-get-hand install-get-dealer install-set-dealer install-set-scores install-get-scores install-set-turn install-get-turn install-set-played install-get-played install-get-phase install-set-phase install-get-bid install-set-bid install-get-players install-set-players
 
 compile-create-game:
 	cd create-game && npm run compile
@@ -102,6 +105,8 @@ compile-set-bid:
 compile-get-players:
 	cd get-players && npm run compile
 
+compile-set-players:
+	cd set-players && npm run compile
 
 compile-all: compile-create-game compile-deal-hands compile-get-hand compile-get-dealer compile-set-dealer compile-set-scores compile-get-scores compile-set-turn compile-get-turn compile-set-played compile-get-played compile-get-phase compile-set-phase compile-get-bid compile-set-bid compile-get-players
 
@@ -152,3 +157,6 @@ invoke-set-bid: compile-set-bid build
 
 invoke-get-players: compile-get-players build
 	sam local invoke GetPlayersFunction --event events/getPlayers.json
+
+invoke-set-players: compile-set-players build
+	sam local invoke SetPlayersFunction --event events/setPlayers.json
