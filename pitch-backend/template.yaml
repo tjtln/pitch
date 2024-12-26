@@ -311,6 +311,28 @@ Resources:
             Path: /games/{gameId}/players/
             Method: get
 
+# Set Players Function
+  SetPlayersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/app.handler
+      Runtime: nodejs22.x
+      MemorySize: 128
+      Timeout: 10
+      CodeUri: set-players/
+      Environment:
+        Variables:
+          GAME_TABLE: !Ref GameTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref GameTable
+      Events:
+        SetBidApi:
+          Type: Api
+          Properties:
+            Path: /games/{gameId}/players/
+            Method: post
+
 # Get Bid Function
   GetBidFunction:
     Type: AWS::Serverless::Function
