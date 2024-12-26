@@ -108,7 +108,7 @@ compile-get-players:
 compile-set-players:
 	cd set-players && npm run compile
 
-compile-all: compile-create-game compile-deal-hands compile-get-hand compile-get-dealer compile-set-dealer compile-set-scores compile-get-scores compile-set-turn compile-get-turn compile-set-played compile-get-played compile-get-phase compile-set-phase compile-get-bid compile-set-bid compile-get-players
+compile-all: compile-create-game compile-deal-hands compile-get-hand compile-get-dealer compile-set-dealer compile-set-scores compile-get-scores compile-set-turn compile-get-turn compile-set-played compile-get-played compile-get-phase compile-set-phase compile-get-bid compile-set-bid compile-get-players compile-set-players
 
 invoke-create-game: compile-create-game build
 	sam local invoke CreateGameFunction --event events/createGame.json
