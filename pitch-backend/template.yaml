@@ -376,6 +376,7 @@ Resources:
           Properties:
             Path: /games/{gameId}/phase
             Method: get
+
   # DynamoDB Table for Game Data
   GameTable:
     Type: AWS::DynamoDB::Table
@@ -392,6 +393,127 @@ Resources:
         SSEEnabled: true
       TimeToLiveSpecification:
         AttributeName: ttl # Optional for automatic record expiration
+        Enabled: true
+      Tags:
+        - Key: Project
+          Value: CardGameApp
+
+  # Websocket stuff
+  WebSocketApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: PitchWebSocket
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: "$request.body.action"
+
+  WebSocketConnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref WebSocketApi
+      RouteKey: $connect
+      AuthorizationType: NONE
+      Target: !Sub "integrations/${WebSocketConnectIntegration}"
+
+  WebSocketDisconnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref WebSocketApi
+      RouteKey: $disconnect
+      AuthorizationType: NONE
+      Target: !Sub "integrations/${WebSocketDisconnectIntegration}"
+
+  WebSocketDefaultRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref WebSocketApi
+      RouteKey: $default
+      AuthorizationType: NONE
+      Target: !Sub "integrations/${WebSocketDefaultIntegration}"
+
+  WebSocketConnectIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WebSocketApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt WebSocketConnectFunction.Arn
+      PayloadFormatVersion: "2.0"
+
+  WebSocketDisconnectIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WebSocketApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt WebSocketDisconnectFunction.Arn
+      PayloadFormatVersion: "2.0"
+
+  WebSocketDefaultIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WebSocketApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt WebSocketDefaultFunction.Arn
+      PayloadFormatVersion: "2.0"
+
+  WebSocketConnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/connect.handler
+      Runtime: nodejs22.x
+      MemorySize: 128
+      Timeout: 10
+      CodeUri: websocket-connect/
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref WebSocketConnectionsTable
+      Environment:
+        Variables:
+          CONNECTIONS_TABLE: !Ref WebSocketConnectionsTable
+
+  WebSocketDisconnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/disconnect.handler
+      Runtime: nodejs22.x
+      MemorySize: 128
+      Timeout: 10
+      CodeUri: websocket-disconnect/
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref WebSocketConnectionsTable
+      Environment:
+        Variables:
+          CONNECTIONS_TABLE: !Ref WebSocketConnectionsTable
+
+  WebSocketDefaultFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/default.handler
+      Runtime: nodejs22.x
+      MemorySize: 128
+      Timeout: 10
+      CodeUri: websocket-default/
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref WebSocketConnectionsTable
+      Environment:
+        Variables:
+          CONNECTIONS_TABLE: !Ref WebSocketConnectionsTable
+
+  WebSocketConnectionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: WebSocketConnectionsTable
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: connectionId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: connectionId
+          KeyType: HASH
+      SSESpecification:
+        SSEEnabled: true
+      TimeToLiveSpecification:
+        AttributeName: ttl
         Enabled: true
       Tags:
         - Key: Project
