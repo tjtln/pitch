@@ -55,7 +55,16 @@ install-get-players:
 install-set-players:
 	cd set-players && npm i
 
-install-all: install-create-game install-deal-hands install-get-hand install-get-dealer install-set-dealer install-set-scores install-get-scores install-set-turn install-get-turn install-set-played install-get-played install-get-phase install-set-phase install-get-bid install-set-bid install-get-players install-set-players
+install-websocket-connect:
+	cd websocket-connect && npm i
+
+install-websocket-disconnect:
+	cd websocket-disconnect && npm i
+
+install-websocket-default:
+	cd websocket-default && npm i
+
+install-all: install-create-game install-deal-hands install-get-hand install-get-dealer install-set-dealer install-set-scores install-get-scores install-set-turn install-get-turn install-set-played install-get-played install-get-phase install-set-phase install-get-bid install-set-bid install-get-players install-set-players install-websocket-connect install-websocket-disconnect install-websocket-default
 
 compile-create-game:
 	cd create-game && npm run compile
@@ -108,7 +117,16 @@ compile-get-players:
 compile-set-players:
 	cd set-players && npm run compile
 
-compile-all: compile-create-game compile-deal-hands compile-get-hand compile-get-dealer compile-set-dealer compile-set-scores compile-get-scores compile-set-turn compile-get-turn compile-set-played compile-get-played compile-get-phase compile-set-phase compile-get-bid compile-set-bid compile-get-players compile-set-players
+compile-websocket-connect:
+	cd websocket-connect && npm run compile
+
+compile-websocket-disconnect:
+	cd websocket-disconnect && npm run compile
+
+compile-websocket-default:
+	cd websocket-default && npm run compile
+
+compile-all: compile-create-game compile-deal-hands compile-get-hand compile-get-dealer compile-set-dealer compile-set-scores compile-get-scores compile-set-turn compile-get-turn compile-set-played compile-get-played compile-get-phase compile-set-phase compile-get-bid compile-set-bid compile-get-players compile-set-players compile-websocket-connect compile-websocket-disconnect compile-websocket-default
 
 invoke-create-game: compile-create-game build
 	sam local invoke CreateGameFunction --event events/createGame.json
